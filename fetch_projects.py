@@ -49,7 +49,8 @@ def fetch_cnv(client, table, gene_list):
     query = f"""
     SELECT
         case_barcode,
-        ARRAY_AGG(STRUCT(gene_name, copy_number)) AS agg
+        ARRAY_AGG(gene_name   ORDER BY gene_name) AS labels,
+        ARRAY_AGG(copy_number ORDER BY gene_name) AS values
     FROM `{table}`
     WHERE gene_name IN ('{genes_sql}')
     GROUP BY case_barcode
@@ -65,7 +66,8 @@ def fetch_rna(client, table, gene_list):
     query = f"""
     SELECT
         case_barcode,
-        ARRAY_AGG(STRUCT(gene_name, fpkm_unstranded)) AS agg
+        ARRAY_AGG(gene_name        ORDER BY gene_name) AS labels,
+        ARRAY_AGG(fpkm_unstranded  ORDER BY gene_name) AS values
     FROM `{table}`
     WHERE gene_name IN ('{genes_sql}')
     GROUP BY case_barcode
@@ -81,7 +83,8 @@ def fetch_mirna(client, table, mirna_list):
     query = f"""
     SELECT
         case_barcode,
-        ARRAY_AGG(STRUCT(mirna_id, reads_per_million_miRNA_mapped)) AS agg
+        ARRAY_AGG(mirna_id                        ORDER BY mirna_id) AS labels,
+        ARRAY_AGG(reads_per_million_miRNA_mapped  ORDER BY mirna_id) AS values
     FROM `{table}`
     WHERE mirna_id IN ('{mirnas_sql}')
     GROUP BY case_barcode
@@ -97,7 +100,8 @@ def fetch_methylation(client, table, probe_list):
     query = f"""
     SELECT
         case_barcode,
-        ARRAY_AGG(STRUCT(probe_id, beta_value)) AS agg
+        ARRAY_AGG(probe_id    ORDER BY probe_id) AS labels,
+        ARRAY_AGG(beta_value  ORDER BY probe_id) AS values
     FROM `{table}`
     WHERE probe_id IN ('{probes_sql}')
     GROUP BY case_barcode
